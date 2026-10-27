@@ -2,44 +2,1403 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Creative Agent</title>
-</head>
-<body>
-  <p id="status" role="status" aria-live="polite">채팅에 연결하는 중입니다...</p>
-  <div id="webchat" style="height: 600px"></div>
-  <script src="https://cdn.botframework.com/botframework-webchat/4.18.0/webchat.js"></script>
-  <script>
-    const BROKER_URL = "https://dl-broker-juwon-4jt3z.azurewebsites.net/api/directlineToken";
-    const SEALED = "nRG28MtSCwnijkEx75noGzAEEoL8hEiZmFUl-vVa2QmjsF5JKarP5hbfKpM4lG7oiWgUOZYQZRomJtJzGCUf1EVtsJYAZfXRztbTqdkmA_gdUTdNPwxmKZb-u0juu_iZ9jYl_EX0kIQ9ZX2WFVyN-FKK08QY-leUqpZC1ImuEV3VCXBkY6-egiP1lSAo6X_wp1z8qwd2l1BP_iF6miRN8M16vvZSbIOXWiVLFJe0Fw-zduQ8aaiOz-hPm7e9IJDLbeMV8VuiGzGxrYRS4C8SzdElQeWJIQuVlGa8RqTHfeH_hKBybIHmuYmrb86k2UDaHTO5-eeAfm2Vk9Cz-U__yU4z70X3VOPSDvG7wgkExjKZlLMHOEe3eluVReifDL-Q1pcNvm9SBBdH6setTUoWKR8qEoSjonDzZCDIIeIlxHePjA-h5Vvvj7_dUnlVIL9Rz3rxzqwxqdy9KmpTDJ4VJvv23WA1A3F_Rn5Xymvv6fUH2GOzGaJPPHd8Btr-CYHHCuixt8a9lXZWoe6sWxdUvdSq27t97PI_a0vjV_nD6NNAEZZ6WbFMCcpuixpfllX7a-Z7x3loq5m3xrTSXzg-PbKVKybMhjLx-CgZ3Hpbq-loB7WgKpainyhGxJNJXOXs3HC6MozwrxUmsqTOK2urrDrSbg";
-    const status = document.getElementById("status");
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Creative Agent Team — Silicon Valley AI Studio</title>
+  
+  <!-- 글꼴: Pretendard Variable & Instrument Serif -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
 
-    function showError(message) {
-      status.hidden = false;
-      status.textContent = message;
+  <style>
+    /* ==========================================
+       1. Base & Reset
+       ========================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      background-color: #F7F7FB;
+      color: #14142B;
+      font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
+    body {
+      background-color: #F7F7FB;
+      color: #14142B;
+      overflow-x: hidden;
+      position: relative;
+      word-break: keep-all;
+    }
+
+    /* 노이즈 질감 오버레이 */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* 타이포그래피 공통 */
+    .italic-serif {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .brand-gradient-text {
+      background: linear-gradient(120deg, #4F6BFF, #8B5CF6 40%, #EC4899 70%, #FF7A45);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    section {
+      scroll-margin-top: 96px;
+    }
+
+    /* 히어로·CTA 패널: 색이 패널을 가득 채우는 메시 그라데이션 */
+    .mesh {
+      background: radial-gradient(circle at 16% 18%, #8EA2FF 0 14%, transparent 32%),
+                  radial-gradient(circle at 78% 9%, #FFB3D9 0 13%, transparent 30%),
+                  radial-gradient(circle at 66% 62%, #FFD3A8 0 16%, transparent 34%),
+                  radial-gradient(circle at 25% 74%, #9BE3FF 0 15%, transparent 32%),
+                  radial-gradient(circle at 50% 32%, #C4A5FF 0 16%, transparent 36%),
+                  linear-gradient(135deg, #fff, #F5F0FF 40%, #FFF7F0);
+    }
+
+    /* ==========================================
+       2. UI Components & Glassmorphism
+       ========================================== */
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.55);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 30px 80px -30px rgba(76, 70, 160, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      border-radius: 9999px;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.55);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 30px 80px -30px rgba(76, 70, 160, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      border-radius: 28px;
+    }
+
+    .btn-black {
+      background-color: #14142B;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 9999px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.2s cubic-bezier(.2,1.3,.3,1), background-color 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-black:hover {
+      transform: translateY(-2px);
+      background-color: #2D2D4D;
+    }
+
+    /* ==========================================
+       3. Header Navigation
+       ========================================== */
+    .nav-container {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(1080px, calc(100% - 24px));
+      z-index: 1000;
+      height: 64px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #14142B;
+      text-decoration: none;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(120deg, #6E8BFF, #A77BFF 40%, #FF8AC8 70%, #FFB37A);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #6B6B80;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: #14142B;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-container { padding: 0 12px; }
+      .nav-brand span { font-size: 13px; }
+      .btn-black { padding: 8px 14px; font-size: 12px; }
+    }
+
+    /* ==========================================
+       4. Hero Section
+       ========================================== */
+    .hero-wrapper {
+      padding: 92px 12px 12px 12px;
+    }
+
+    .hero-panel {
+      border-radius: 36px;
+      padding: 48px 24px 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #14142B;
+      margin-bottom: 20px;
+      white-space: nowrap;
+    }
+
+    .hero-badge-dot {
+      color: #6E8BFF;
+    }
+
+    .hero-title {
+      font-size: clamp(40px, 6vw, 88px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      text-wrap: balance;
+      margin-bottom: 16px;
+      max-width: 960px;
+    }
+
+    .hero-sub {
+      font-size: clamp(15px, 1.8vw, 20px);
+      color: #6B6B80;
+      max-width: 680px;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .logo-strip {
+      margin-top: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px 28px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(20, 20, 43, 0.4);
+      letter-spacing: -0.01em;
+    }
+
+    /* ==========================================
+       5. Chat Widget (In Hero)
+       ========================================== */
+    .chat-card {
+      width: min(860px, 100%);
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-card > * { flex: none; }
+    .chat-card > #webchat { height: 200px; min-height: 0; }
+    body.is-started .chat-card { height: calc(100svh - 112px); }
+    body.is-started .chat-card > #webchat { flex: 1 1 0; height: auto; min-height: 0; }
+
+    .chat-topbar {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(20, 20, 43, 0.06);
+    }
+
+    .chat-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .chat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(20, 20, 43, 0.15);
+    }
+
+    .chat-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #14142B;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #9CA3AF;
+    }
+    body.is-connected .status-indicator {
+      background-color: #10B981;
+    }
+
+    .btn-new-chat {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(20, 20, 43, 0.08);
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6B6B80;
+      cursor: pointer;
+    }
+
+    .chat-foot {
+      padding: 12px 16px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .example-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      white-space: nowrap;
+    }
+    .example-chips::-webkit-scrollbar { display: none; }
+    body.is-started .example-chips { display: none; }
+
+    .chip-btn {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(20, 20, 43, 0.08);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      color: #14142B;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .chip-btn:hover {
+      background: #FFFFFF;
+      border-color: #4F6BFF;
+      color: #4F6BFF;
+    }
+
+    .working-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: #5B4BC4;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+    body.is-working .working-bar { display: flex; }
+
+    .working-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .working-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #8B5CF6;
+      animation: dotPulse 1.4s infinite ease-in-out both;
+    }
+    .working-dots span:nth-child(1) { animation-delay: 0s; }
+    .working-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .working-dots span:nth-child(3) { animation-delay: 0.4s; }
+    .working-dots span:nth-child(4) { animation-delay: 0.6s; }
+    .working-dots span:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes dotPulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .composer {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(20, 20, 43, 0.12);
+      border-radius: 28px;
+      padding: 8px 12px 8px 18px;
+      transition: all 0.2s cubic-bezier(.2,1.3,.3,1);
+    }
+    .composer:focus-within {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -8px rgba(76, 70, 160, 0.2);
+      background: #FFFFFF;
+    }
+
+    .composer textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      resize: none;
+      font-family: inherit;
+      font-size: 14.5px;
+      color: #14142B;
+      max-height: 140px;
+      line-height: 1.4;
+      padding: 6px 0;
+    }
+    .composer textarea::placeholder {
+      color: #9CA3AF;
+    }
+
+    .btn-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #14142B;
+      color: #FFFFFF;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      opacity: 0.3;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-send.active {
+      opacity: 1;
+    }
+    .btn-send.active:hover {
+      transform: scale(1.05);
+    }
+
+    .chat-disclaimer {
+      font-size: 11px;
+      color: #9CA3AF;
+      text-align: center;
+    }
+
+    /* 오로라 테두리 애니메이션 */
+    @property --aurora { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    .composer::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      padding: 1.5px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .6s;
+      background: conic-gradient(from var(--aurora), #a5b4fc, #f0abfc, #fda4af, #fcd34d, #86efac, #67e8f9, #a5b4fc);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: aurora 6s linear infinite;
+    }
+    body.is-working .composer::before { opacity: .8; }
+    @keyframes aurora { to { --aurora: 360deg; } }
+
+    /* Web Chat Overrides */
+    #webchat .webchat__typing-indicator { display: none !important; }
+    #webchat .webchat__stacked-layout:not(.webchat__stacked-layout--from-user) .webchat__stacked-layout__status { display: none; }
+    #webchat .webchat__stacked-layout__attachment-row { margin-top: 8px !important; }
+    #webchat .webchat__stacked-layout__attachment, #webchat .webchat__stacked-layout__attachment .webchat__bubble__content { background: none !important; border: 0 !important; overflow: visible !important; }
+    #webchat .webchat__stacked-layout__content:has(.webchat__fileContent) { overflow: visible !important; }
+    #webchat .webchat__fileContent { padding: 0 !important; }
+    #webchat .webchat__fileContent__buttonLink { display: flex !important; align-items: center; gap: 12px; height: 56px; padding: 0 18px 0 12px; border-radius: 18px; text-decoration: none; color: #14142B; background: rgba(255,255,255,.72); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 10px 24px -16px rgba(76,70,160,.3), inset 0 1px 1px #fff; }
+    #webchat .webchat__fileContent__buttonLink::before { content: "FILE"; flex: none; padding: 5px 8px; border-radius: 999px; background: linear-gradient(120deg, #EEF0FF, #FBEFFF); color: #5B4BC4; font: 600 10.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; }
+    #webchat a[download$=".pptx" i]::before { content: "PPTX"; } #webchat a[download$=".docx" i]::before { content: "DOCX"; } #webchat a[download$=".xlsx" i]::before { content: "XLSX"; } #webchat a[download$=".html" i]::before { content: "HTML"; }
+    #webchat .webchat__fileContent__badge { flex: 1; min-width: 0; background: none !important; padding: 0 !important; }
+    #webchat .webchat__fileContent__fileName { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace !important; color: #14142B !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #webchat .webchat__fileContent__downloadIcon { flex: none; box-sizing: content-box; width: 16px; height: 16px; padding: 0; fill: #6B6B80; color: #6B6B80; }
+    #webchat .webchat__render-markdown { word-break: keep-all; overflow-wrap: anywhere; line-height: 1.7; }
+    #webchat .webchat__render-markdown table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; border-spacing: 0; margin: 12px 0; font-variant-numeric: tabular-nums; }
+    #webchat .webchat__render-markdown th, #webchat .webchat__render-markdown td { padding: 9px 18px 9px 0; border-bottom: 1px solid rgba(20,20,43,.08); white-space: nowrap; }
+    #webchat .webchat__render-markdown th { font-size: 12px; font-weight: 600; color: #6B6B80; }
+
+    /* ==========================================
+       6. Stats Bar
+       ========================================== */
+    .stats-section {
+      padding: 60px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+
+    .stat-item h3 {
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .stat-item p {
+      font-size: 14px;
+      color: #6B6B80;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; }
+    }
+
+    /* ==========================================
+       7. Section Common Layout
+       ========================================== */
+    .section-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .section-tag {
+      font-size: 20px;
+      color: #8B5CF6;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 4.2vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      text-wrap: balance;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: #6B6B80;
+      margin-top: 12px;
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ==========================================
+       8. Features (Bento Grid)
+       ========================================== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+    }
+
+    .bento-card {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(.2,1.3,.3,1);
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .bento-card.col-3 { grid-column: span 3; }
+    .bento-card.col-2 { grid-column: span 2; }
+
+    @media (max-width: 900px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card.col-3, .bento-card.col-2 { grid-column: span 1; }
+    }
+
+    .bento-mockup {
+      height: 160px;
+      margin-bottom: 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Mockup 1: PPTX Slide Fan */
+    .mock-ppt-wrap {
+      position: relative;
+      width: 140px;
+      height: 90px;
+    }
+    .mock-ppt-card {
+      position: absolute;
+      inset: 0;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: transform 0.3s cubic-bezier(.2,1.3,.3,1);
+      padding: 10px;
+    }
+    .mock-ppt-card:nth-child(1) { transform: rotate(-8deg) translateY(4deg); }
+    .mock-ppt-card:nth-child(2) { transform: rotate(0deg); }
+    .mock-ppt-card:nth-child(3) { transform: rotate(8deg) translateY(-4deg); background: linear-gradient(135deg, #EEF2FF, #FAF5FF); }
+    .bento-card:hover .mock-ppt-card:nth-child(1) { transform: rotate(-18deg) translateX(-16px); }
+    .bento-card:hover .mock-ppt-card:nth-child(3) { transform: rotate(18deg) translateX(16px); }
+
+    /* Mockup 2: Poster */
+    .mock-poster {
+      width: 100px;
+      height: 130px;
+      background: linear-gradient(135deg, #FF6B4A, #A77BFF);
+      border-radius: 12px;
+      color: #FFF;
+      padding: 12px;
+      box-shadow: 0 12px 24px rgba(255, 107, 74, 0.3);
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s;
+    }
+    .bento-card:hover .mock-poster { transform: scale(1.05) rotate(-2deg); }
+
+    /* Mockup 3: Proposal DOCX */
+    .mock-doc {
+      width: 110px;
+      height: 130px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .mock-doc-header { height: 16px; background: linear-gradient(90deg, #4F6BFF, #8B5CF6); }
+    .mock-doc-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .mock-line { height: 6px; background: #E5E7EB; border-radius: 3px; }
+
+    /* Mockup 4: Webpage HTML */
+    .mock-browser {
+      width: 140px;
+      height: 110px;
+      background: #FFF;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .mock-browser-bar { height: 18px; background: #F3F4F6; display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+    .mock-browser-dot { width: 5px; height: 5px; border-radius: 50%; background: #D1D5DB; }
+
+    /* Mockup 5: Budget XLSX */
+    .mock-budget {
+      width: 130px;
+      background: #FFF;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+    }
+    .mock-chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 40px; margin-top: 8px; }
+    .mock-bar { flex: 1; background: #6E8BFF; border-radius: 4px 4px 0 0; height: 0%; transition: height 1s cubic-bezier(.2,1.3,.3,1); }
+    .bento-card.revealed .mock-bar:nth-child(1) { height: 50%; }
+    .bento-card.revealed .mock-bar:nth-child(2) { height: 85%; }
+    .bento-card.revealed .mock-bar:nth-child(3) { height: 65%; }
+
+    .bento-info h4 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .bento-info p { font-size: 14px; color: #6B6B80; line-height: 1.5; margin-bottom: 16px; }
+    .bento-filename { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #5B4BC4; background: rgba(139, 92, 246, 0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
+
+    /* ==========================================
+       9. How It Works (Orbit Section)
+       ========================================== */
+    .how-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .how-grid { grid-template-columns: 1fr; }
+    }
+
+    .orbit-card {
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .orbit { --r: 150px; position: relative; width: calc(var(--r) * 2); aspect-ratio: 1; margin: 48px auto; }
+    .orbit-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(20,20,43,.16); animation: orbit-spin 40s linear infinite; }
+    .orbit .agent { position: absolute; left: 50%; top: 50%; transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); }
+    .orbit .agent b { position: absolute; translate: -50% -50%; white-space: nowrap; padding: 8px 12px; border-radius: 999px; font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: #5B4BC4; background: rgba(255,255,255,.8); border: 1px solid #fff; animation: orbit-spin 40s linear infinite reverse; }
+    .orbit .leader { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 112px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: rgba(255, 255, 255, 0.8); border: 1px solid #FFF; box-shadow: 0 10px 30px rgba(120, 100, 255, 0.2); }
+    @keyframes orbit-spin { to { rotate: 360deg; } }
+    @media (max-width: 600px) { .orbit { --r: 100px; } .orbit .agent b { font-size: 10px; padding: 6px 9px; } .orbit .leader { width: 84px; } }
+
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-item {
+      padding: 20px 24px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .step-item h5 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #14142B; }
+    .step-item p { font-size: 14px; color: #6B6B80; line-height: 1.5; }
+
+    /* ==========================================
+       10. Design System Full Banner
+       ========================================== */
+    .design-banner {
+      background: linear-gradient(120deg, #5B3DF5, #FF4FA3, #FF9F45);
+      color: #FFFFFF;
+      padding: 100px 24px;
+      text-align: center;
+    }
+
+    .design-banner .section-tag { color: rgba(255,255,255,0.8); }
+    .design-banner .section-title { color: #FFFFFF; }
+    .design-banner .section-sub { color: rgba(255,255,255,0.85); }
+
+    .theme-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 48px;
+      max-width: 1080px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .theme-card {
+      background: rgba(255, 255, 255, 0.15);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1 1 180px;
+      min-width: 180px;
+    }
+
+    .theme-dots { display: flex; gap: -6px; }
+    .theme-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); }
+    .theme-info { text-align: left; }
+    .theme-name { font-size: 15px; font-weight: 700; }
+    .theme-desc { font-size: 12px; opacity: 0.8; }
+
+    /* ==========================================
+       11. Marquee Section
+       ========================================== */
+    .marquee-section {
+      padding: 100px 0;
+      overflow: hidden;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 12px;
+      width: max-content;
+      margin-bottom: 12px;
+    }
+
+    .track-left { animation: marqueeLeft 35s linear infinite; }
+    .track-right { animation: marqueeRight 35s linear infinite; }
+
+    @keyframes marqueeLeft { to { transform: translateX(-50%); } }
+    @keyframes marqueeRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+    .marquee-chip {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(20, 20, 43, 0.08);
+      border-radius: 9999px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #14142B;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .marquee-chip:hover {
+      background: #FFFFFF;
+      transform: translateY(-2px);
+      color: #4F6BFF;
+    }
+
+    /* ==========================================
+       12. Final CTA & Footer
+       ========================================== */
+    .cta-wrapper {
+      padding: 0 12px 40px 12px;
+    }
+
+    .cta-panel {
+      border-radius: 36px;
+      padding: 80px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .cta-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-top: 8px;
+      margin-bottom: 32px;
+      letter-spacing: -0.04em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 13px;
+      color: #6B6B80;
+      border-top: 1px solid rgba(20, 20, 43, 0.06);
+    }
+
+    /* ==========================================
+       13. Floating Notification Widget
+       ========================================== */
+    .floating-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 900;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #14142B;
+      transition: transform 0.2s;
+    }
+    .floating-widget:hover {
+      transform: translateY(-2px);
+    }
+
+    /* ==========================================
+       14. Animations & Reveal Effects
+       ========================================== */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s cubic-bezier(.2,1.3,.3,1), transform 0.8s cubic-bezier(.2,1.3,.3,1);
+    }
+    [data-reveal].revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Floating Header Navigation -->
+  <header class="nav-container glass-pill">
+    <a href="#" class="nav-brand">
+      <div class="nav-dot"></div>
+      <span>AI Creative Agent Team</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">기능</a></li>
+      <li><a href="#how">작동 방식</a></li>
+      <li><a href="#design">디자인</a></li>
+    </ul>
+    <a href="#hero" onclick="focusChatComposer(event)" class="btn-black">지금 써 보기</a>
+  </header>
+
+  <!-- 2. Hero Section -->
+  <div class="hero-wrapper" id="hero">
+    <div class="hero-panel mesh">
+      <div class="hero-badge glass-pill">
+        <span class="hero-badge-dot">●</span> Copilot Studio 멀티 에이전트 &nbsp;·&nbsp; <span class="italic-serif">One idea, five deliverables.</span>
+      </div>
+      
+      <h1 class="hero-title">
+        한 줄의 아이디어, <span class="brand-gradient-text">다섯 개의 결과물.</span>
+      </h1>
+      
+      <p class="hero-sub">
+        팀장 에이전트가 전문가 다섯에게 일을 나눠, 발표자료부터 예산 분석까지 한 번에 만들어 드려요.
+      </p>
+
+      <!-- Chat Card -->
+      <section class="chat-card glass-card">
+        <div class="chat-topbar">
+          <div class="chat-dots">
+            <div class="chat-dot"></div>
+            <div class="chat-dot"></div>
+            <div class="chat-dot"></div>
+          </div>
+          <div class="chat-status-bar">
+            <div class="status-indicator" id="statusDot"></div>
+            <span id="statusText">팀을 부르는 중…</span>
+          </div>
+          <button class="btn-new-chat" onclick="resetChat()">새 대화</button>
+        </div>
+
+        <div id="webchat"></div>
+
+        <div class="chat-foot">
+          <div class="example-chips">
+            <button class="chip-btn" onclick="sendQuickPrompt('가을 학교 축제 기획해 줘')">가을 학교 축제 기획해 줘</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('탄소중립 캠페인 홍보물 만들어 줘')">탄소중립 캠페인 홍보물 만들어 줘</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('교사 AI 연수 프로그램 제안해 줘')">교사 AI 연수 프로그램 제안해 줘</button>
+          </div>
+
+          <div class="working-bar">
+            <div class="working-dots">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="workingTimer">팀이 작업 중 · 0:00</span>
+          </div>
+
+          <div class="composer">
+            <textarea id="userInput" rows="1" placeholder="무엇을 만들어 볼까요?" onkeydown="handleInputKeyDown(event)" oninput="autoResizeTextarea(this)"></textarea>
+            <button class="btn-send" id="sendBtn" onclick="submitMessage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            </button>
+          </div>
+
+          <p class="chat-disclaimer">AI는 실수할 수 있어요. 중요한 내용은 확인하세요.</p>
+        </div>
+      </section>
+
+      <div class="logo-strip">
+        <span>Microsoft Copilot Studio</span> · <span>Claude Opus 5.5</span> · <span>PowerPoint</span> · <span>Word</span> · <span>Excel</span> · <span>HTML</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Stats Section -->
+  <section class="stats-section">
+    <div class="stats-grid" data-reveal>
+      <div class="stat-item">
+        <h3 class="brand-gradient-text" data-count="1">0</h3>
+        <p>번의 요청</p>
+      </div>
+      <div class="stat-item">
+        <h3 class="brand-gradient-text" data-count="6">0</h3>
+        <p>명의 에이전트</p>
+      </div>
+      <div class="stat-item">
+        <h3 class="brand-gradient-text" data-count="7">0</h3>
+        <p>개의 작업 매뉴얼</p>
+      </div>
+      <div class="stat-item">
+        <h3 class="brand-gradient-text" data-count="5">0</h3>
+        <p>개의 파일</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Features Section (Bento Grid) -->
+  <section class="section-container" id="features">
+    <div class="section-header" data-reveal>
+      <span class="section-tag italic-serif">Five deliverables.</span>
+      <h2 class="section-title">한 번의 요청으로 받는 다섯 가지</h2>
+    </div>
+
+    <div class="bento-grid">
+      <!-- Feature 1 -->
+      <div class="bento-card glass-card col-3" data-reveal>
+        <div class="bento-mockup">
+          <div class="mock-ppt-wrap">
+            <div class="mock-ppt-card"></div>
+            <div class="mock-ppt-card"></div>
+            <div class="mock-ppt-card"></div>
+          </div>
+        </div>
+        <div class="bento-info">
+          <h4>말할 거리가 정리된 10장</h4>
+          <p>10장 내외 슬라이드와 발표자 노트까지 한 번에 정리된 발표용 슬라이드</p>
+          <span class="bento-filename">presentation.pptx</span>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="bento-card glass-card col-3" data-reveal>
+        <div class="bento-mockup">
+          <div class="mock-poster">
+            <span>2026 FEST</span>
+            <span style="font-size: 10px; font-weight: normal;">AI CREATIVE</span>
+          </div>
+        </div>
+        <div class="bento-info">
+          <h4>걸어 두고 싶은 한 장</h4>
+          <p>브라우저에서 바로 여는 유리 질감 포스터, 인쇄·PDF 저장도 간편하게</p>
+          <span class="bento-filename">poster.html</span>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="bento-card glass-card col-2" data-reveal>
+        <div class="bento-mockup">
+          <div class="mock-doc">
+            <div class="mock-doc-header"></div>
+            <div class="mock-doc-body">
+              <div class="mock-line" style="width: 80%;"></div>
+              <div class="mock-line" style="width: 100%;"></div>
+              <div class="mock-line" style="width: 60%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bento-info">
+          <h4>바로 보낼 수 있는 제안서</h4>
+          <p>테마 색 표지와 읽기 좋은 본문 구조의 워드 문서</p>
+          <span class="bento-filename">proposal.docx</span>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="bento-card glass-card col-2" data-reveal>
+        <div class="bento-mockup">
+          <div class="mock-browser">
+            <div class="mock-browser-bar">
+              <div class="mock-browser-dot"></div>
+              <div class="mock-browser-dot"></div>
+              <div class="mock-browser-dot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bento-info">
+          <h4>신청까지 받는 랜딩</h4>
+          <p>유리 메뉴 바와 카드로 만든 소개·신청 웹페이지</p>
+          <span class="bento-filename">webpage.html</span>
+        </div>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="bento-card glass-card col-2" data-reveal>
+        <div class="bento-mockup">
+          <div class="mock-budget">
+            <div style="font-size: 12px; font-weight: 800; color: #14142B;">₩12,400,000</div>
+            <div class="mock-chart-bars">
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bento-info">
+          <h4>숫자가 맞는 예산</h4>
+          <p>숫자 카드와 차트, 합계는 수식으로 자동 계산</p>
+          <span class="bento-filename">budget_analysis.xlsx</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. How It Works Section -->
+  <section class="section-container" id="how">
+    <div class="section-header" data-reveal>
+      <span class="section-tag italic-serif">How the team works.</span>
+      <h2 class="section-title">팀장 하나, 전문가 다섯, 매뉴얼 일곱.</h2>
+    </div>
+
+    <div class="how-grid">
+      <!-- Orbit Diagram -->
+      <div class="orbit-card glass-card" data-reveal>
+        <div class="orbit">
+          <div class="orbit-ring">
+            <span class="agent" style="--a:0deg"><b>ppt-agent</b></span>
+            <span class="agent" style="--a:72deg"><b>poster-agent</b></span>
+            <span class="agent" style="--a:144deg"><b>proposal-agent</b></span>
+            <span class="agent" style="--a:216deg"><b>webpage-agent</b></span>
+            <span class="agent" style="--a:288deg"><b>budget-agent</b></span>
+          </div>
+          <div class="leader">팀장</div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-list" data-reveal>
+        <div class="step-item">
+          <h5>① 브리프</h5>
+          <p>요청을 한 장짜리 기획서로 정리하고 컬러 테마를 정해요.</p>
+        </div>
+        <div class="step-item">
+          <h5>② 예산 먼저</h5>
+          <p>budget-agent가 예산 기준표로 모든 금액의 기준을 잡아요.</p>
+        </div>
+        <div class="step-item">
+          <h5>③ 원고</h5>
+          <p>전문가들이 같은 브리프로 각자 원고를 써요.</p>
+        </div>
+        <div class="step-item">
+          <h5>④ 파일 5개</h5>
+          <p>디자인 규칙에 맞춰 파일을 만들어 한 번에 첨부해요.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Design System Section -->
+  <section class="design-banner" id="design">
+    <div data-reveal>
+      <span class="section-tag italic-serif">One design language.</span>
+      <h2 class="section-title">다섯 파일, 하나의 리퀴드 글래스.</h2>
+      <p class="section-sub">재질과 레이아웃은 늘 같고, 색만 주제에 맞게 바뀝니다.</p>
+    </div>
+
+    <div class="theme-cards" data-reveal>
+      <div class="theme-card">
+        <div class="theme-dots">
+          <div class="theme-dot" style="background: #A8D8FF;"></div>
+          <div class="theme-dot" style="background: #007AFF; margin-left: -8px;"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">스카이</div>
+          <div class="theme-desc">교육 · 일반 행사</div>
+        </div>
+      </div>
+
+      <div class="theme-card">
+        <div class="theme-dots">
+          <div class="theme-dot" style="background: #1EC8FF;"></div>
+          <div class="theme-dot" style="background: #FF2E93; margin-left: -8px;"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">팝</div>
+          <div class="theme-desc">IT 캠페인 · 축제</div>
+        </div>
+      </div>
+
+      <div class="theme-card">
+        <div class="theme-dots">
+          <div class="theme-dot" style="background: #0B1628;"></div>
+          <div class="theme-dot" style="background: #6EA8FF; margin-left: -8px;"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">네이비</div>
+          <div class="theme-desc">공공 보고서 · 정책</div>
+        </div>
+      </div>
+
+      <div class="theme-card">
+        <div class="theme-dots">
+          <div class="theme-dot" style="background: #A8E3C4;"></div>
+          <div class="theme-dot" style="background: #12A150; margin-left: -8px;"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">그린</div>
+          <div class="theme-desc">환경 · ESG</div>
+        </div>
+      </div>
+
+      <div class="theme-card">
+        <div class="theme-dots">
+          <div class="theme-dot" style="background: #FFC2B3;"></div>
+          <div class="theme-dot" style="background: #FF6B4A; margin-left: -8px;"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">코럴</div>
+          <div class="theme-desc">가족 · 복지</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Prompt Marquee Section -->
+  <section class="marquee-section">
+    <div class="section-header" data-reveal>
+      <span class="section-tag italic-serif">Ready prompts.</span>
+      <h2 class="section-title">이런 요청에 강해요</h2>
+    </div>
+
+    <div class="marquee-track track-left">
+      <button class="marquee-chip" onclick="fillPrompt('가을 학교 축제 기획해 줘')">가을 학교 축제</button>
+      <button class="marquee-chip" onclick="fillPrompt('탄소중립 캠페인 홍보물 만들어 줘')">탄소중립 캠페인</button>
+      <button class="marquee-chip" onclick="fillPrompt('교사 AI 연수 프로그램 제안해 줘')">교사 AI 연수</button>
+      <button class="marquee-chip" onclick="fillPrompt('신제품 런칭 행사 기획해 줘')">신제품 런칭 행사</button>
+      <button class="marquee-chip" onclick="fillPrompt('진로 체험 주간 행사 기획해 줘')">진로 체험 주간</button>
+      <!-- 반복복사 -->
+      <button class="marquee-chip" onclick="fillPrompt('가을 학교 축제 기획해 줘')">가을 학교 축제</button>
+      <button class="marquee-chip" onclick="fillPrompt('탄소중립 캠페인 홍보물 만들어 줘')">탄소중립 캠페인</button>
+      <button class="marquee-chip" onclick="fillPrompt('교사 AI 연수 프로그램 제안해 줘')">교사 AI 연수</button>
+      <button class="marquee-chip" onclick="fillPrompt('신제품 런칭 행사 기획해 줘')">신제품 런칭 행사</button>
+      <button class="marquee-chip" onclick="fillPrompt('진로 체험 주간 행사 기획해 줘')">진로 체험 주간</button>
+    </div>
+
+    <div class="marquee-track track-right">
+      <button class="marquee-chip" onclick="fillPrompt('지역 축제 홍보 기획해 줘')">지역 축제 홍보</button>
+      <button class="marquee-chip" onclick="fillPrompt('고객 제안 워크숍 준비해 줘')">고객 제안 워크숍</button>
+      <button class="marquee-chip" onclick="fillPrompt('학부모 설명회 자료 만들어 줘')">학부모 설명회</button>
+      <button class="marquee-chip" onclick="fillPrompt('해커톤 행사 제안해 줘')">해커톤</button>
+      <button class="marquee-chip" onclick="fillPrompt('동아리 박람회 홍보 기획해 줘')">동아리 박람회</button>
+      <!-- 반복복사 -->
+      <button class="marquee-chip" onclick="fillPrompt('지역 축제 홍보 기획해 줘')">지역 축제 홍보</button>
+      <button class="marquee-chip" onclick="fillPrompt('고객 제안 워크숍 준비해 줘')">고객 제안 워크숍</button>
+      <button class="marquee-chip" onclick="fillPrompt('학부모 설명회 자료 만들어 줘')">학부모 설명회</button>
+      <button class="marquee-chip" onclick="fillPrompt('해커톤 행사 제안해 줘')">해커톤</button>
+      <button class="marquee-chip" onclick="fillPrompt('동아리 박람회 홍보 기획해 줘')">동아리 박람회</button>
+    </div>
+  </section>
+
+  <!-- 8. Final Call to Action -->
+  <div class="cta-wrapper">
+    <div class="cta-panel mesh">
+      <span class="italic-serif" style="font-size: 24px; color: #8B5CF6;">Your turn.</span>
+      <h2 class="cta-title">지금, 아이디어 한 줄을<br>적어 보세요.</h2>
+      <a href="#hero" onclick="focusChatComposer(event)" class="btn-black" style="padding: 16px 36px; font-size: 16px;">대화 시작하기 ↑</a>
+    </div>
+  </div>
+
+  <!-- 9. Footer -->
+  <footer>
+    <p>AI Creative Agent Team · Copilot Studio로 만든 멀티 에이전트 · © 2026</p>
+  </footer>
+
+  <!-- 10. Floating Status Widget -->
+  <div class="floating-widget glass-pill" id="floatingWidget" onclick="scrollToChat()">
+    <span id="floatingWidgetText">팀이 작업 중 · 0:00</span>
+  </div>
+
+  <!-- BotFramework WebChat CDN -->
+  <script src="https://cdn.botframework.com/botframework-webchat/4.18.0/webchat.js"></script>
+
+  <script>
+    /* ==========================================
+       Broker & Connection Parameters (절대 변경 금지)
+       ========================================== */
+    const BROKER_URL = "https://dl-broker-juwon-4jt3z.azurewebsites.net/api/directlineToken";
+    const SEALED = "nRG28MtSCwnijkEx75noGzAEEoL8hEiZmFUl-vVa2QmjsF5JKarP5hbfKpM4lG7oiWgUOZYQZRomJtJzGCUf1EVtsJYAZfXRztbTqdkmA_gdUTdNPwxmKZb-u0juu_iZ9jYl_EX0kIQ9ZX2WFVyN-FKK08QY-leUqpZC1ImuEV3VCXBkY6-egiP1lSAo6X_wp1z8qwd2l1BP_iF6miRN8M16vvZSbIOXWiVLFJe0Fw-zduQ8aaiOz-hPm7e9IJDLbeMV8VuiGzGxrYRS4C8SzdElQeWJIQuVlGa8RqTHfeH_hKBybIHmuYmrb86k2UDaHTO5-eeAfm2Vk9Cz-U__yU4z70X3VOPSDvG7wgkExjKZlLMHOEe3eluVReifDL-Q1pcNvm9SBBdH6setTUoWKR8qEoSjonDzZCDIIeIlxHePjA-h5Vvvj7_dUnlVIL9Rz3rxzqwxqdy9KmpTDJ4VJvv23WA1A3F_Rn5Xymvv6fUH2GOzGaJPPHd8Btr-CYHHCuixt8a9lXZWoe6sWxdUvdSq27t97PI_a0vjV_nD6NNAEZZ6WbFMCcpuixpfllX7a-Z7x3loq5m3xrTSXzg-PbKVKybMhjLx-CgZ3Hpbq-loB7WgKpainyhGxJNJXOXs3HC6MozwrxUmsqTOK2urrDrSbg";
+
+    let directLineStore = null;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    /* 스크롤 및 포커스 유틸리티 */
+    function scrollToChat() {
+      const chatCard = document.querySelector(".chat-card");
+      if (chatCard) {
+        const top = chatCard.getBoundingClientRect().top + window.scrollY - 88;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }
+
+    function focusChatComposer(e) {
+      if (e) e.preventDefault();
+      scrollToChat();
+      const textarea = document.getElementById("userInput");
+      if (textarea) {
+        textarea.focus({ preventScroll: true });
+      }
+    }
+
+    function autoResizeTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+      const sendBtn = document.getElementById("sendBtn");
+      if (el.value.trim().length > 0) {
+        sendBtn.classList.add("active");
+      } else {
+        sendBtn.classList.remove("active");
+      }
+    }
+
+    /* 입력 관련 처리 */
+    function handleInputKeyDown(e) {
+      if (e.isComposing || e.keyCode === 229) return;
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitMessage();
+      }
+    }
+
+    function submitMessage() {
+      const textarea = document.getElementById("userInput");
+      const text = textarea.value.trim();
+      if (!text || !directLineStore) return;
+
+      textarea.value = "";
+      autoResizeTextarea(textarea);
+
+      // 메시지 전송 및 화면 상태 변경
+      directLineStore.dispatch({ type: "WEB_CHAT/SEND_MESSAGE", payload: { text } });
+      document.body.classList.add("is-started");
+      startWorkingState();
+      scrollToChat();
+    }
+
+    function sendQuickPrompt(promptText) {
+      const textarea = document.getElementById("userInput");
+      textarea.value = promptText;
+      submitMessage();
+    }
+
+    function fillPrompt(promptText) {
+      const textarea = document.getElementById("userInput");
+      textarea.value = promptText + " 기획해 줘";
+      autoResizeTextarea(textarea);
+      focusChatComposer();
+    }
+
+    /* 작업 진행 타이머 상태 관리 */
+    function startWorkingState() {
+      document.body.classList.add("is-working");
+      secondsElapsed = 0;
+      updateTimerText();
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerText();
+      }, 1000);
+    }
+
+    function stopWorkingState() {
+      document.body.classList.remove("is-working");
+      clearInterval(timerInterval);
+      document.getElementById("floatingWidget").style.display = "none";
+    }
+
+    function updateTimerText() {
+      const mins = Math.floor(secondsElapsed / 60);
+      const secs = String(secondsElapsed % 60).padStart(2, '0');
+      let text = `팀이 작업 중 · ${mins}:${secs}`;
+      if (secondsElapsed >= 20) {
+        text += " (파일 5개를 만드느라 몇 분 걸릴 수 있어요)";
+      }
+
+      document.getElementById("workingTimer").textContent = text;
+      
+      // Floating Widget 관리
+      const chatCard = document.querySelector(".chat-card");
+      if (chatCard) {
+        const rect = chatCard.getBoundingClientRect();
+        const isOutOfView = rect.bottom < 0 || rect.top > window.innerHeight;
+        const widget = document.getElementById("floatingWidget");
+        if (isOutOfView && document.body.classList.contains("is-working")) {
+          widget.style.display = "flex";
+          document.getElementById("floatingWidgetText").textContent = `팀이 작업 중 · ${mins}:${secs}`;
+        } else if (isOutOfView && !document.body.classList.contains("is-working") && document.body.classList.contains("is-started")) {
+          widget.style.display = "flex";
+          document.getElementById("floatingWidgetText").textContent = "결과가 도착했어요 ↑";
+        } else {
+          widget.style.display = "none";
+        }
+      }
+    }
+
+    window.addEventListener("scroll", updateTimerText);
+
+    function resetChat() {
+      location.reload();
+    }
+
+    /* Web Chat 연결 및 초기화 */
     async function connect() {
-      if (!window.WebChat ||
-          typeof WebChat.createDirectLine !== "function" ||
-          typeof WebChat.renderWebChat !== "function") {
-        showError("채팅 구성 요소를 불러오지 못했습니다. 네트워크를 확인한 뒤 새로고침해 주세요.");
+      const statusText = document.getElementById("statusText");
+
+      if (!window.WebChat || typeof WebChat.createDirectLine !== "function" || typeof WebChat.renderWebChat !== "function") {
+        statusText.textContent = "채팅 구성 요소를 불러오지 못했습니다.";
         return;
       }
 
       let response;
       try {
-        // Keep this a simple CORS request; the broker may not support preflight.
         response = await fetch(BROKER_URL, {
           method: "POST",
           body: JSON.stringify({ sealed: SEALED })
         });
       } catch {
-        showError("서버에 연결하지 못했습니다. 네트워크와 배포 주소를 확인해 주세요.");
+        showErrorUI("지금은 팀과 연결할 수 없어요", "네트워크/CORS 오류가 발생했습니다.");
         return;
       }
+
       if (!response.ok) {
-        showError("서버가 연결 요청을 처리하지 못했습니다 (HTTP " + response.status + ").");
+        showErrorUI("지금은 팀과 연결할 수 없어요", `HTTP status ${response.status}`);
         return;
       }
 
@@ -47,29 +1406,115 @@
       try {
         data = await response.json();
       } catch {
-        showError("서버 응답을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.");
+        showErrorUI("지금은 팀과 연결할 수 없어요", "JSON 파싱에 실패했습니다.");
         return;
       }
+
       if (!data || typeof data.token !== "string" || !data.token.trim()) {
-        showError("서버에서 연결 토큰을 받지 못했습니다. 암호와 배포 주소를 확인해 주세요.");
+        showErrorUI("지금은 팀과 연결할 수 없어요", "유효한 토큰을 전달받지 못했습니다.");
         return;
       }
 
       try {
         const directLine = WebChat.createDirectLine({ token: data.token });
-        status.hidden = true;
+
+        // Store 미들웨어 구성
+        const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
+          if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
+            document.body.classList.add("is-connected");
+            statusText.textContent = "AI Creative Agent Team";
+          }
+          
+          if (action.type === "DIRECT_LINE/INCOMING_ACTIVITY") {
+            const { activity } = action.payload;
+            if (activity && activity.from && activity.from.role !== "user") {
+              if (activity.type === "message") {
+                stopWorkingState();
+              }
+            }
+          }
+          return next(action);
+        });
+
+        directLineStore = store;
+
+        // 첫 인사 요청
         directLine.postActivity({
           type: "event", name: "startConversation", from: { id: "user" }
-        }).subscribe({
-          error: () => showError("첫 인사를 요청하지 못했습니다. 채팅창에 메시지를 입력해 주세요.")
-        });
-        WebChat.renderWebChat({ directLine, locale: "ko-KR" }, document.getElementById("webchat"));
-      } catch {
-        showError("채팅을 시작하지 못했습니다. 새로고침 후 다시 시도해 주세요.");
+        }).subscribe({});
+
+        // 렌더링
+        WebChat.renderWebChat({
+          directLine,
+          store,
+          locale: "ko-KR",
+          styleOptions: {
+            hideSendBox: true,
+            rootHeight: "100%",
+            backgroundColor: "transparent",
+            primaryFont: "'Pretendard Variable', -apple-system, sans-serif",
+            bubbleBackground: "transparent",
+            bubbleBorderWidth: 0,
+            bubbleMaxWidth: 720,
+            bubbleMinWidth: 0,
+            bubbleFromUserBackground: "linear-gradient(135deg, #EEF0FF, #FBEFFF)",
+            bubbleFromUserBorderWidth: 0,
+            bubbleFromUserBorderRadius: 20
+          }
+        }, document.getElementById("webchat"));
+
+      } catch (err) {
+        showErrorUI("지금은 팀과 연결할 수 없어요", err.message);
       }
     }
 
-    connect();
+    function showErrorUI(mainMessage, errDetail) {
+      document.body.classList.add("is-error");
+      const statusText = document.getElementById("statusText");
+      statusText.textContent = "연결 오류";
+
+      const foot = document.querySelector(".chat-foot");
+      if (foot) {
+        foot.innerHTML = `
+          <div style="text-align: center; padding: 12px; color: #6B6B80; font-size: 13.5px;">
+            <p style="margin-bottom: 4px; font-weight: 600;">${mainMessage}</p>
+            <p style="font-family: monospace; font-size: 11px; opacity: 0.7; margin-bottom: 12px;">${errDetail}</p>
+            <button onclick="location.reload()" class="chip-btn" style="background: #14142B; color: #FFF;">다시 시도</button>
+          </div>
+        `;
+      }
+    }
+
+    /* 숫자 카운트업 & Scroll Reveal Observer */
+    document.addEventListener("DOMContentLoaded", () => {
+      // Intersection Observer for Data Reveal
+      const revealElements = document.querySelectorAll("[data-reveal]");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+
+            // Stat Count Animation
+            const countEls = entry.target.querySelectorAll("[data-count]");
+            countEls.forEach(el => {
+              const targetNum = parseInt(el.getAttribute("data-count"), 10);
+              let start = 0;
+              const duration = 1200;
+              const stepTime = Math.abs(Math.floor(duration / targetNum));
+              const timer = setInterval(() => {
+                start += 1;
+                el.textContent = start;
+                if (start >= targetNum) clearInterval(timer);
+              }, stepTime);
+            });
+          }
+        });
+      }, { threshold: 0.1 });
+
+      revealElements.forEach(el => observer.observe(el));
+
+      connect();
+    });
   </script>
 </body>
 </html>
